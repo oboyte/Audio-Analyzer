@@ -4,6 +4,7 @@ use rustfft::{FftPlanner};
 mod window;
 mod fft;
 
+
 fn main() {
     // Get access to local audio devices on computer
     let host = cpal::default_host();
@@ -57,6 +58,9 @@ fn main() {
 
                 // Remove first 1024 elements, let remaining carry on to the next time this if statement runs.
                 sample_buffer.drain(..fft_size);
+
+                // Get magnitude spectrum (frequency, magnitude)
+                let spectrum = crate::fft::get_spectrum(&buffer, supported_configs.sample_rate().0);
             }
             
         },
