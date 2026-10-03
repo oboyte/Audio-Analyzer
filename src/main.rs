@@ -1,9 +1,8 @@
-use cpal::Data;
 use cpal::traits::{HostTrait, DeviceTrait, StreamTrait};
-
-use crate::window::get_windowed_signal;
+use rustfft::{FftPlanner};
 
 mod window;
+mod fft;
 
 fn main() {
     // Get access to local audio devices on computer
@@ -24,16 +23,41 @@ fn main() {
 
     let config = supported_configs.config();
 
+    // Want to collect 1024 samples from left microphone (monotone)
+    let mut sample_buffer: Vec<f32> = Vec::new();
+
+    let fft_size = 1024;
+    // The planner in rustfft chooses which algorithm is best suited for the task
+    let mut planner = FftPlanner::<f32>::new();
+    let fft = planner.plan_fft_forward(fft_size); // We want to get freq. components (bins), thus we use FFT forward algorithms
+            
+
     let stream = device.build_input_stream(
         &config, 
         move |data: &[f32], _: &cpal::InputCallbackInfo| {
             // React to stream events and read or write stream data inside this
             println!("Samples received: {}", data.len());
 
-            // Data gets x[n] values, as in samples from microphone, we want to convert these to X[m] values, so into frequency components.
+            for frame in data.chunks_exact(2) {
+                sample_buffer.push(frame[0]); // Collect only left data
+            }
             
-            // Start with getting the windowed signal (x[n] * w[n]) to reduce leakage
-            let windowed_signal = get_windowed_signal(data);
+            // rustfmt del
+            while sample_buffer.len() >= fft_size {
+                // Collect first 1024 samples into a block
+                let fft_block = &sample_buffer[..fft_size];
+
+                // Start with getting the windowed signal (x[n] * w[n]) to reduce leakage
+                let windowed_signal = crate::window::get_windowed_signal(fft_block);
+                
+                // Get complex buffer {re:samp + im:j0}
+                let mut buffer = crate::fft::get_buffer(&windowed_signal);
+
+                fft.process(&mut buffer);
+
+                // Remove first 1024 elements, let remaining carry on to the next time this if statement runs.
+                sample_buffer.drain(..fft_size);
+            }
             
         },
         move |err| {
