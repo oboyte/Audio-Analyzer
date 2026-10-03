@@ -31,7 +31,6 @@ fn main() {
     // The planner in rustfft chooses which algorithm is best suited for the task
     let mut planner = FftPlanner::<f32>::new();
     let fft = planner.plan_fft_forward(fft_size); // We want to get freq. components (bins), thus we use FFT forward algorithms
-            
 
     let stream = device.build_input_stream(
         &config, 
@@ -61,6 +60,9 @@ fn main() {
 
                 // Get magnitude spectrum (frequency, magnitude)
                 let spectrum = crate::fft::get_spectrum(&buffer, supported_configs.sample_rate().0);
+
+                let dominant = crate::fft::get_dominant_freq(&spectrum);
+                println!("Dominante frekvens er {} Hz med magnitude {} dB", dominant.0, 20.0 * f32::log10(dominant.1));
             }
             
         },

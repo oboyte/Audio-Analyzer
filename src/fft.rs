@@ -31,3 +31,13 @@ pub fn get_spectrum(bins: &[Complex<f32>], sample_rate: u32)
     }   
     magnitude_spectrum
 }
+
+pub fn get_dominant_freq(mag_spectrum: &[(f32, f32)])  -> (f32, f32) {
+    let mut max: (f32, f32) = (0.0, 0.0);
+    for &(freq, mag) in mag_spectrum {
+        if mag >= max.1 {
+            max = (freq, mag);
+        }
+    }
+    max
+}
