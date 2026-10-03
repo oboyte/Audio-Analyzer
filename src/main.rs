@@ -1,9 +1,9 @@
 use cpal::Data;
 use cpal::traits::{HostTrait, DeviceTrait, StreamTrait};
 
-use crate::fft::get_windowed_signal;
+use crate::window::get_windowed_signal;
 
-mod fft;
+mod window;
 
 fn main() {
     // Get access to local audio devices on computer
@@ -34,7 +34,7 @@ fn main() {
             
             // Start with getting the windowed signal (x[n] * w[n]) to reduce leakage
             let windowed_signal = get_windowed_signal(data);
-
+            
         },
         move |err| {
             // error reactions go here
