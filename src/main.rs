@@ -4,7 +4,6 @@ use rustfft::{FftPlanner};
 mod window;
 mod fft;
 
-
 fn main() {
     // Get access to local audio devices on computer
     let host = cpal::default_host();
@@ -32,11 +31,11 @@ fn main() {
     let mut planner = FftPlanner::<f32>::new();
     let fft = planner.plan_fft_forward(fft_size); // We want to get freq. components (bins), thus we use FFT forward algorithms
 
+    let mut counter = 0;
+
     let stream = device.build_input_stream(
         &config, 
         move |data: &[f32], _: &cpal::InputCallbackInfo| {
-            // React to stream events and read or write stream data inside this
-            println!("Samples received: {}", data.len());
 
             for frame in data.chunks_exact(2) {
                 sample_buffer.push(frame[0]); // Collect only left data
@@ -61,8 +60,16 @@ fn main() {
                 // Get magnitude spectrum (frequency, magnitude)
                 let spectrum = crate::fft::get_spectrum(&buffer, supported_configs.sample_rate().0);
 
-                let dominant = crate::fft::get_dominant_freq(&spectrum);
-                println!("Dominante frekvens er {} Hz med magnitude {} dB", dominant.0, 20.0 * f32::log10(dominant.1));
+                // Counter to have less spam in terminal
+                if counter == 10 {
+                    let dominant = crate::fft::get_dominant_freq(&spectrum);
+                    println!("Dominante frekvens er {} Hz med magnitude {} dB", dominant.0, 20.0 * f32::log10(dominant.1));
+                    counter = 0;
+                } else {
+                    counter += 1;
+                }
+
+                
             }
             
         },
@@ -77,7 +84,7 @@ fn main() {
     stream.play().expect("Error, couldnt start stream");
     println!("Stream started.");
 
-    std::thread::sleep(std::time::Duration::from_secs(10));
-
-    
+    loop {
+        std::thread::sleep(std::time::Duration::from_secs(1));
+    }
 }
