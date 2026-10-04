@@ -43,12 +43,6 @@ impl eframe::App for Visualizer {
             }));
 
         Plot::new("spectrum_plot")
-            //.x_axis_label("Frequency [Hz]")
-            //.y_axis_label("Magnitude")
-            //.include_y(-0.2)
-            //.include_y(80)
-            //.include_x(0)
-            //.include_x(24_000)
             .auto_bounds(false)
             .show(ui, |plot_ui| {
                 plot_ui.bar_chart(chart);
