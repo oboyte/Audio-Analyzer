@@ -1,21 +1,23 @@
 use cpal::traits::{HostTrait, DeviceTrait, StreamTrait};
 use rustfft::{FftPlanner};
+use std::sync::{Arc, Mutex};
 
 mod window;
 mod fft;
+mod visualizer;
 
 fn main() {
     // Get access to local audio devices on computer
     let host = cpal::default_host();
 
-    // Find default input devices
-    let device = host.default_input_device().expect("Coldnt find Input device");
+    // Find default output devices
+    let device = host.default_output_device().expect("Coldnt find Input device");
 
     println!("Device name: {}", device.name().expect("Couldnt find name"));
 
     // Find the supported configs range for the input device
     //let mut supported_configs_range = device.supported_input_configs().expect("error while querying configs");
-    let supported_configs = device.default_input_config().expect("Couldnt get default input confih");
+    let supported_configs = device.default_output_config().expect("Couldnt get default input confih");
 
     println!("Sample format: {:?}", supported_configs.sample_format());
     println!("Sample rate: {}", supported_configs.sample_rate().0);
@@ -31,12 +33,12 @@ fn main() {
     let mut planner = FftPlanner::<f32>::new();
     let fft = planner.plan_fft_forward(fft_size); // We want to get freq. components (bins), thus we use FFT forward algorithms
 
-    let mut counter = 0;
+    let spectrum_shared = Arc::new(Mutex::new(Vec::<(f32, f32)>::new()));
+    let spectrum_audio = Arc::clone(&spectrum_shared);
 
     let stream = device.build_input_stream(
         &config, 
         move |data: &[f32], _: &cpal::InputCallbackInfo| {
-
             for frame in data.chunks_exact(2) {
                 sample_buffer.push(frame[0]); // Collect only left data
             }
@@ -59,17 +61,8 @@ fn main() {
 
                 // Get magnitude spectrum (frequency, magnitude)
                 let spectrum = crate::fft::get_spectrum(&buffer, supported_configs.sample_rate().0);
-
-                // Counter to have less spam in terminal
-                if counter == 10 {
-                    let dominant = crate::fft::get_dominant_freq(&spectrum);
-                    println!("Dominante frekvens er {} Hz med magnitude {} dB", dominant.0, 20.0 * f32::log10(dominant.1));
-                    counter = 0;
-                } else {
-                    counter += 1;
-                }
-
                 
+                *spectrum_audio.lock().unwrap() = spectrum;
             }
             
         },
@@ -84,7 +77,13 @@ fn main() {
     stream.play().expect("Error, couldnt start stream");
     println!("Stream started.");
 
-    loop {
-        std::thread::sleep(std::time::Duration::from_secs(1));
-    }
+    let eframe_options = eframe::NativeOptions::default();
+
+    let _eframe = eframe::run_native(
+        "Test", 
+        eframe_options, 
+        Box::new(|_cc| Ok(Box::new(crate::visualizer::Visualizer::new(
+            Arc::clone(&spectrum_shared)
+        )))),
+    ).expect("Couldnt start app!");
 }

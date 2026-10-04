@@ -5,4 +5,6 @@ edition = "2024"
 
 [dependencies]
 cpal = "0.16"
+eframe = { version = "0.36.2", default-features = false, features = ["glow", "default_fonts"] }
+egui_plot = "0.37.0"
 rustfft = "6.4.1"

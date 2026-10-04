@@ -21,19 +21,16 @@ pub fn get_spectrum(bins: &[Complex<f32>], sample_rate: u32)
         // Insert frequency into index 0
         let frequency = n as f32 * sample_rate as f32 / bins.len() as f32;
         // Insert magnitude into index 1
-        let magnitude = 
-            f32::sqrt( 
-                f32::powi(bins[n].re, 2) 
-                + f32::powi(bins[n].im, 2) 
-            );
-        
+        let mag =  f32::sqrt(f32::powi(bins[n].re, 2) + f32::powi(bins[n].im, 2) ) / bins.len() as f32;
+        let magnitude = 20.0 * mag.max(1e-12).log10();
+
         magnitude_spectrum.push((frequency, magnitude));
     }   
     magnitude_spectrum
 }
 
 pub fn get_dominant_freq(mag_spectrum: &[(f32, f32)])  -> (f32, f32) {
-    let mut max: (f32, f32) = (0.0, 0.0);
+    let mut max: (f32, f32) = (0.0, f32::NEG_INFINITY);
     for &(freq, mag) in mag_spectrum {
         if mag >= max.1 {
             max = (freq, mag);
