@@ -1,4 +1,4 @@
-# Audio Visualizer
+# Audio Spectrum Visualizer
 Project started out as an Audio Analyzer in order to practice theory learned in Digital Signal Processing course, ended up turning it into a visualizer too.\
 <img width="796" height="599" alt="image" src="https://github.com/user-attachments/assets/03b1d348-848b-42c5-82ba-ac3c614c247f" />\
 
