@@ -1,6 +1,7 @@
 # Audio Spectrum Visualizer
 Project started out as an Audio Analyzer in order to practice theory learned in Digital Signal Processing course, ended up turning it into a visualizer too.\
-<img width="835" height="598" alt="image" src="https://github.com/user-attachments/assets/3169d97e-b84d-4d7d-ab20-ac3b1cad990b" />
+<img width="797" height="596" alt="image" src="https://github.com/user-attachments/assets/7375a848-aee7-44ab-9f69-8f8046c349e2" />
+
 
 ## Dependencies
 cpal - Record output/input audio\
