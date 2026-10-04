@@ -43,6 +43,8 @@ impl eframe::App for Visualizer {
             }));
 
         Plot::new("spectrum_plot")
+            .x_axis_label("Frekvens [Hz]")
+            .y_axis_label("Magnitude [dB]")
             .auto_bounds(false)
             .show(ui, |plot_ui| {
                 plot_ui.bar_chart(chart);
