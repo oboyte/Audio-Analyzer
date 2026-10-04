@@ -4,10 +4,10 @@ Project started out as an Audio Analyzer in order to practice theory learned in 
 
 
 ## Dependencies
-cpal - Record output/input audio\
-rustfft - Fast Fourier Transform algorithm\
-eframe - For visualizer program\
-egui_plot - Histogram plot
+[cpal](https://github.com/RustAudio/cpal) - Record output/input audio\
+[rustfft](https://github.com/ejmahler/rustfft) - Fast Fourier Transform algorithm\
+[egui_plot](https://github.com/emilk/egui_plot) - Histogram plot\
+eframe - For visualizer program
 
 ## How to change from visualizing output (desktop audio) to input (microphone audio):
 Change these lines:
