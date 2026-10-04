@@ -39,7 +39,7 @@ impl eframe::App for Visualizer {
 
         let chart = BarChart::new("Spectrum", bars)
             .element_formatter(Box::new(|bar, _chart| {
-                format!("Frekvens: {:.1}, Magnitude: -{:.1} dB", bar.argument, bar.value)
+                format!("Frekvens: {:.1} Hz, Magnitude: -{:.1}dB", bar.argument, bar.value)
             }));
 
         Plot::new("spectrum_plot")
