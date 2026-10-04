@@ -80,7 +80,7 @@ fn main() {
     let eframe_options = eframe::NativeOptions::default();
 
     let _eframe = eframe::run_native(
-        "Test", 
+        "Audio Spectrum Visualizer", 
         eframe_options, 
         Box::new(|_cc| Ok(Box::new(crate::visualizer::Visualizer::new(
             Arc::clone(&spectrum_shared)
